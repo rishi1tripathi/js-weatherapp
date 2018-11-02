@@ -1,49 +1,84 @@
+
 (function(){
-let appId : string  = "74e3eb76846212e4854eaafd1e725d82";
-let temperatureUnit : string= "metric";
-let searchMethod : string ='q';
+    
+let appId = "74e3eb76846212e4854eaafd1e725d82";
+let temperatureUnit = "metric";
+let searchMethod='q';
 let x=32;
-let favouriteArray : Array<object> = [];
+
 
 const temperatureSwicthToggle = {
     flap : document.getElementById('flap'),
     toggle : document.querySelector('.toggle'),
     choice1 : document.getElementById('choice1'),
     choice2 : document.getElementById('choice2'),
-};
+    clickHandler :(e) => {
 
-let flap : HTMLElement = temperatureSwicthToggle.flap;
-let backgroundImage : CSSStyleDeclaration = document.body.style;
-let weatherDescriptionHeader : HTMLElement = document.getElementById('weatherDescriptionHeader');
-let temperatureElement : HTMLElement = document.getElementById('temperature');
-let humidityElement : HTMLElement = document.getElementById('humidity');
-let windspeedElement : HTMLElement = document.getElementById('windspeed');
-let cityHeader : HTMLElement = document.getElementById('cityHeader');
-let weatherIcon : HTMLElement = document.getElementById('documentIconImage');
-let favourite : HTMLElement = document.getElementById("favourite");
-let isFavouriteStatus  = favourite.childNodes[0];
+        if (e.target.tagName === 'LABEL') {
+            setTimeout(() => {
+                if(temperatureSwicthToggle.flap.children[0].textContent!=e.target.textContent){
+                    
+                    temperatureSwicthToggle.flap.children[0].textContent = e.target.textContent;
+                    let convertedTemperature;
+    
+                    if(e.target.textContent=='Celsius'){
+                        temperatureUnit='metric';
+                        convertedTemperature=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'C');
+                        events.publish('changeTemperatureUnit',{'convertedTemperature':convertedTemperature,'convertedTemperatureUnit':'C'})
+                        //temperatureElement.innerHTML=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'C');
+                    }
+                       
+                    if(e.target.textContent=='Fahrenheit'){
+                        temperatureUnit='imperial';
+                        convertedTemperature=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'F');
+                      events.publish('changeTemperatureUnit',{'convertedTemperature':convertedTemperature,'convertedTemperatureUnit':'F'})
+                        //temperatureElement.innerHTML=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'F');
+                    }
+                       
+                }
+    
+            }, 250);
+        }
+    }
+}
+interface FavouriteModel{
+    cityName:string,
+    cityTemperature:string
+}
+interface FavouriteModelList extends Array<FavouriteModel>{}
+let backgroundImage=document.body.style;
+let weatherDescriptionHeader=document.getElementById('weatherDescriptionHeader');
+let temperatureElement = document.getElementById('temperature');
+let humidityElement=document.getElementById('humidity');
+let windspeedElement=document.getElementById('windspeed');
+let cityHeader=document.getElementById('cityHeader');
+let weatherIcon:HTMLImageElement = <HTMLImageElement>document.getElementById('documentIconImage');
+let favourite = document.getElementById("favourite");
+let isFavouriteStatus= <HTMLElement> favourite.childNodes[0];
 let resultDescription;
-let modal : HTMLElement = document.getElementById('myModal');
-let span : Element = document.getElementsByClassName("close")[0];
-let popupHeader : HTMLElement = document.getElementById("popheader");
-let popupBody : HTMLElement = document.getElementById("popbody");
-let futureWeatherContainerDiv : Element =document.getElementsByClassName("futureWeatherContainer")[0];
-let futureCityNameDiv : Element = document.getElementsByClassName("futureCityName")[0];
-let futureDetailsDiv : NodeListOf<Element> = document.getElementsByClassName("futureDetails");
-let futureDayDiv : NodeListOf<Element> = document.getElementsByClassName("futureDay");
-let futureTempDiv : NodeListOf<Element> = document.getElementsByClassName("futureTemp");
-let futureDisplayDiv : HTMLElement = document.getElementById("openFuture");
-let favouriteCityContainerDiv : HTMLDivElement ;
-let favouriteCityNameDiv : HTMLDivElement;
-let favouriteCityTemperatureDiv : HTMLDivElement;
-let favouriteCityRemoveIconDiv : HTMLDivElement;
-let futureTemperature : Array<number> = [];
-let futureWeatherDetails: Array<object>=[];
+let modal = document.getElementById('myModal');
+let span =  <HTMLElement>document.getElementsByClassName("close")[0];
+let popupHeader = document.getElementById("popheader");
+let popupBody=document.getElementById("popbody");
+let futureWeatherContainerDiv=document.getElementsByClassName("futureWeatherContainer")[0];
+let futureCityNameDiv = document.getElementsByClassName("futureCityName")[0];
+let futureDetailsDiv = document.getElementsByClassName("futureDetails");
+let futureDayDiv = document.getElementsByClassName("futureDay");
+let futureTempDiv = document.getElementsByClassName("futureTemp");
+let futureDisplayDiv = document.getElementById("openFuture");
+let favouriteCityContainerDiv;
+let favouriteCityNameDiv;
+let favouriteCityTemperatureDiv;
+let favouriteCityRemoveIconDiv;
+let futureTemperature=[];
+let futureWeatherDetails=[];
 let namesOfDay = ["Sunday","Monday","TuesDay","Wednesday","ThursDay","Friday","Saturday"];
-favouriteArray=JSON.parse(localStorage.getItem("favouriteList"));
+let favouriteArray :FavouriteModelList=JSON.parse(localStorage.getItem("favouriteList"));
 
 
-Object.prototype.toggletemperatureMetrics=function (n,unit){
+
+
+let toggletemperatureMetrics=function (n,unit){
     console.log("bravo");
     if(unit==='C')
         return Math.round((n-32)/(9/5));
@@ -82,13 +117,14 @@ let events={
 if(favouriteArray != null)
     favouriteArray.forEach(element => {
         let temp = element.cityTemperature.slice(-1);
+        let temperature:number;
         if(temp ==='F'){
-            temp = toggletemperatureMetrics(parseInt(element.cityTemperature),'C')
+            temperature = toggletemperatureMetrics(parseInt(element.cityTemperature),'C')
         }
         else{
-            temp = parseInt(element.cityTemperature);
+            temperature = parseInt(element.cityTemperature);
         }
-        addCityToFavouriteList(element.cityName,temp,4)
+        addCityToFavouriteList(element.cityName,temperature,0);
     });
 else
     favouriteArray=[];   
@@ -96,8 +132,8 @@ else
 navigator.geolocation.getCurrentPosition(success,error);
 
   function success(position) {
-    latitude = position.coords.latitude;
-    longitude = position.coords.longitude;
+    let latitude = position.coords.latitude;
+    let longitude = position.coords.longitude;
     Promise.all( [fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&APPID=${appId}&units=${temperatureUnit}`).then( result=>result.json() ),  fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&APPID=${appId}&units=${temperatureUnit}`).then( result => result.json())] )
     .then((result)=>result.forEach( (currentValue, index)=>{
      if(index===0){
@@ -201,7 +237,7 @@ async function searchWeather(searchTerm){
         setPositionResult();
         response = await fetch(`http://api.openweathermap.org/data/2.5/forecast?${searchMethod}=${searchTerm}&APPID=${appId}&units=${temperatureUnit}`);
         response = await response.json();
-        futureTemperature=response.list.filter((curr,index)=>index%8===0).map(response=>Math.trunc(response.main.temp));
+        futureTemperature=response['list'].filter((curr,index)=>index%8===0).map(response=>Math.trunc(response.main.temp));
         processForecastedWeatherArray();
         diplayForeCastedWeather();
 
@@ -282,7 +318,7 @@ function displayCurrentWeather(resultFromServer){
     weatherIcon.src='http://openweathermap.org/img/w/'+resultFromServer.weather[0].icon+'.png';
     resultDescription=resultFromServer.weather[0].description;
     weatherDescriptionHeader.innerText=resultDescription.charAt(0).toUpperCase()+resultDescription.slice(1);
-    dipalayMainDivTemp();
+    dipalayMainDivTemp(undefined);
     events.subscribe('changeTemperatureUnit',dipalayMainDivTemp);
     
     function dipalayMainDivTemp(value){
@@ -380,7 +416,7 @@ function favouriteClicked(){
     if(favouriteArray.some(value=>value.cityName===cityHeader.innerHTML)){
         console.log("Already exist");
         isFavouriteStatus.innerHTML="remove_circle";
-        deleteCityFromFavourite();
+        deleteCityFromFavourite(undefined);
     }
     else{
         
@@ -390,7 +426,7 @@ function favouriteClicked(){
        
         if(favouriteArray.length<5){
             if(favouriteArray.findIndex(x=>x.cityName===cityName)===-1){
-                addCityToFavouriteList(cityName,cityTemperature);
+                addCityToFavouriteList(cityName,cityTemperature,1);
                // favouriteArray.push({cityName:cityName,cityTemperature:cityTemperature})
             }
         }
@@ -407,7 +443,7 @@ function favouriteClicked(){
 
 
 
-function addCityToFavouriteList(cityName,cityTemperature){
+function addCityToFavouriteList(cityName,cityTemperature,call){
        
     
         favouriteCityContainerDiv=document.createElement('div');
@@ -435,7 +471,7 @@ function addCityToFavouriteList(cityName,cityTemperature){
         document.body.insertBefore(favouriteCityContainerDiv,undefined);
         favouriteCityRemoveIconDiv.addEventListener('click',deleteCityFromFavourite);
         
-        if(arguments.length===2)
+        if(call!==0)
             favouriteArray.push({cityName:cityName,cityTemperature:cityTemperature})
 }
 
@@ -468,7 +504,7 @@ function deleteCityFromFavourite(event){
 
 
 document.getElementById('searchBtn').addEventListener('click',()=>{
-    let searchTerm =document.getElementById('searchInput').value;
+    let searchTerm = (<HTMLInputElement> document.getElementById('searchInput')).value;
     if(searchTerm==='')
     displapPopup("Error","Please enter something to search");
     else
@@ -478,7 +514,7 @@ document.getElementById('searchBtn').addEventListener('click',()=>{
 document.getElementById('searchInput').addEventListener('keyup',(event)=>{
     console.log("Inside keyup event");
     if(event.keyCode===13){
-        let searchTerm =document.getElementById('searchInput').value;
+        let searchTerm = (<HTMLInputElement>document.getElementById('searchInput')).value;
         if(searchTerm==='')
         displapPopup("Error","Please enter something to search");
         else
@@ -515,44 +551,17 @@ window.onclick = function(event) {
 
 temperatureSwicthToggle.flap.addEventListener('transitionend', () => {
 
-    if (temperatureSwicthToggle.choice1.checked) {
-        temperatureSwicthToggle.toggle.style.transform = 'rotateY(-15deg)';
-        setTimeout(() => temperatureSwicthToggle.toggle.style.transform = '', 400);
+    if ( ( <HTMLInputElement>temperatureSwicthToggle.choice1).checked) {
+        (<HTMLElement>temperatureSwicthToggle.toggle).style.transform = 'rotateY(-15deg)';
+        setTimeout(() => (<HTMLElement>temperatureSwicthToggle.toggle).style.transform = '', 400);
     } else {
-        temperatureSwicthToggle.toggle.style.transform = 'rotateY(15deg)';
-        setTimeout(() => temperatureSwicthToggle.toggle.style.transform = '', 400);
+        (<HTMLElement>temperatureSwicthToggle.toggle).style.transform = 'rotateY(15deg)';
+        setTimeout(() => (<HTMLElement>temperatureSwicthToggle.toggle).style.transform = '', 400);
     }
 
 })
 
-temperatureSwicthToggle.clickHandler = (e) => {
 
-    if (e.target.tagName === 'LABEL') {
-        setTimeout(() => {
-            if(temperatureSwicthToggle.flap.children[0].textContent!=e.target.textContent){
-                
-                temperatureSwicthToggle.flap.children[0].textContent = e.target.textContent;
-                let convertedTemperature;
-
-                if(e.target.textContent=='Celsius'){
-                    temperatureUnit='metric';
-                    convertedTemperature=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'C');
-                   events.publish('changeTemperatureUnit',{'convertedTemperature':convertedTemperature,'convertedTemperatureUnit':'C'})
-                    //temperatureElement.innerHTML=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'C');
-                }
-                   
-                if(e.target.textContent=='Fahrenheit'){
-                    temperatureUnit='imperial';
-                    convertedTemperature=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'F');
-                  events.publish('changeTemperatureUnit',{'convertedTemperature':convertedTemperature,'convertedTemperatureUnit':'F'})
-                    //temperatureElement.innerHTML=toggletemperatureMetrics(parseInt(temperatureElement.innerHTML),'F');
-                }
-                   
-            }
-
-        }, 250);
-    }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     temperatureSwicthToggle.flap.children[0].textContent = temperatureSwicthToggle.choice2.previousElementSibling.textContent;
@@ -564,8 +573,8 @@ favourite.addEventListener('click',favouriteClicked);
 
 futureDisplayDiv.addEventListener('click',(e)=>{
     
-    let visible=futureWeatherContainerDiv.style;
-    let expnaderIconClass=futureDisplayDiv.childNodes[0].classList;
+    let visible=(<HTMLElement>futureWeatherContainerDiv).style;
+    let expnaderIconClass= (<HTMLElement>futureDisplayDiv.childNodes[0]).classList;
     if(visible.visibility==='visible'){
         visible.visibility = 'hidden';
         expnaderIconClass.remove("fa-angle-double-left");

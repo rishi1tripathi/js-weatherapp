@@ -1,0 +1,4 @@
+"use strict";
+exports.__esModule = true;
+var f1_1 = require("./f1");
+console.log(f1_1.obj['first']);

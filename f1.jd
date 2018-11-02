@@ -1,0 +1,6 @@
+"use strict";
+exports.__esModule = true;
+exports.obj = {
+    fir: 20,
+    second: 20
+};
