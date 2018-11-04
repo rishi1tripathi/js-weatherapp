@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+          
+    <header>
+        <div class="header">
+                    <h1>Weather application</h1>
+        </div>         
+    </header>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">&times;</span>
+      <h2 id="popheader">Modal Header</h2>
+    </div>
+    <div class="modal-body" id="popbody">
+      <p>Some text in the Modal Body</p>
+
+    </div>
+    
+  </div>
+</div>
+
+
+
+
+
+            <div class="container">
+
+                    <form class="toggle">
+                       <label for="choice1">Fahrenheit</label>
+                        <input type="radio" id="choice1" name="choice" value="Fahrenheit">
+                        
+                        <label for="choice2">Celsius</label>
+                        <input type="radio" id="choice2" name="choice" value="Celsius">
+                        
+            
+                        <div id="flap"><span class="content">productive</span></div>
+            
+                    </form>
+            
+            </div>
+
+
+
+
+    <div id="searchContainer">
+        <input class ="searchControl" type ="text" placeholder="City Name " id ="searchInput">
+        <button class ="searchControl"id ="searchBtn">Search</button>
+    </div>
+    <div id ="weatherContainer">
+
+        <div class ="openFuture" id="openFuture"><i class="fa fa-angle-double-right" style="font-size:48px;color:red"></i></div>
+        <div class="fav" id="favourite"><i class="material-icons">add_circle</i></div> 
+        <div id ="weatherDescription">
+            <h1 id ="cityHeader"></h1>
+            <div id ="weatherMain">
+                <div id ="temperature"></div>
+                <div id ="weatherDescriptionHeader"></div>
+                <div><img id ="documentIconImage"></div>
+            </div>
+            <hr>
+            <div id="windspeed" class  ="bottomDetails"></div>
+            <div id="humidity" class ="bottomDetails"></div>
+        </div>
+
+
+    </div>
+
+    
+    <div class ="futureWeatherContainer"> 
+
+        <div class="futureDetails" ><span class="futureDay">KAnpur</span> <span class="futureTemp">23</span> </div>
+        <div class="futureDetails"><span class="futureDay">KAnpur</span> <span class="futureTemp">23</span> </div>
+        <div  class="futureDetails"><span class="futureDay">KAnpur</span> <span class="futureTemp">23</span> </div>
+        <div  class="futureDetails"><span class="futureDay">KAnpur</span> <span class="futureTemp">23</span> </div>
+        <div  class="futureDetails"><span class="futureDay">KAnpur</span> <span class="futureTemp">23</span> </div>
+    
+    </div>
+    
+
+        <script src="./dist/bundle.js"></script>
+       <!-- <script src="fn2.js"></script> -->
+        
+    </body>
+</html>

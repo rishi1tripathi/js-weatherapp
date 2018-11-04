@@ -1,0 +1,17 @@
+{
+  "name": "weather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "f1.js",
+  "scripts": {
+    "dev": "webpack"
+  },
+  "author": "rishi",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-loader": "^5.3.0",
+    "typescript": "^3.1.6",
+    "webpack": "^4.24.0",
+    "webpack-cli": "^3.1.2"
+  }
+}
